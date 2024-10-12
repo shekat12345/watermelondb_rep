@@ -7,7 +7,9 @@
 
 import React from 'react';
 import type {PropsWithChildren} from 'react';
+import { DatabaseProvider } from '@nozbe/watermelondb/DatabaseProvider';
 import {
+  Button,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -24,38 +26,17 @@ import {
   LearnMoreLinks,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
+// import PostList from './components/PostList';
+import ListCheck from './src/components/listChecker'
+import { database } from './dataBase/database';
+import AddNEwItem from './src/components/addList';
+import { database12 } from './data2/database';
+import test from './rxjs/basic';
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
 
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
 
-function App(): React.JSX.Element {
+
+function App12(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
 
   const backgroundStyle = {
@@ -95,7 +76,23 @@ function App(): React.JSX.Element {
     </SafeAreaView>
   );
 }
-
+const App = () => {
+  return (
+    <DatabaseProvider database={database12}>
+      {/* <App11/> */}
+      {/* <PostList /> */}
+      {/* <AddNEwItem/> */}
+      <ListCheck/>
+      {/* <Button title='press me to test the observable' onPress={()=>{
+        // test.subscribe({
+        //   next(value) { console.log('Received value:', value); },
+        //   complete() { console.log('Stream complete'); }
+        // });
+        test()
+      }}/> */}
+    </DatabaseProvider>
+  );
+};
 const styles = StyleSheet.create({
   sectionContainer: {
     marginTop: 32,
