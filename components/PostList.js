@@ -9,11 +9,11 @@ import EventEmitter from 'react-native/Libraries/vendor/emitter/EventEmitter';
 const PostList = (prp) => {
     console.log(prp.notes[0])
     
-    const callback= ()=>{
-        return database.collections.get('notes').query().observe().pipe()
-    }
     useEffect(()=>{
-        callback
+        callback()
+        return()=>{
+
+        }
     },[prp.notes.length])
   return (
     <View>

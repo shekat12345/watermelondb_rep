@@ -11,3 +11,4 @@ export default class Post extends Model {
   @children('comments') comments; 
   
 }
+

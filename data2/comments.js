@@ -10,3 +10,4 @@ export default class Comment extends Model {
   // Relationship to the Post model
   @relation('posts', 'post_id') post; // Foreign key to Post
 }
+

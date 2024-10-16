@@ -8,3 +8,11 @@ export const commentSchema = tableSchema({
     { name: 'post_id', type: 'string', isIndexed: true }, // Foreign key to Post
   ],
 });
+
+export const PetsSchema1 = tableSchema({
+  name: 'pets',
+  columns: [
+    { name: 'name', type: 'string' }, // Comment text
+    { name: 'owner_id', type: 'string', isIndexed: true }, // Foreign key to Post
+  ],
+});

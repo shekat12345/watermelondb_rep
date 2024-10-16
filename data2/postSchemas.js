@@ -7,3 +7,11 @@ export const postSchema = tableSchema({
     { name: 'title', type: 'string' },
   ],
 });
+
+export const ownerSchema = tableSchema({
+  name: 'petowners',
+  columns: [
+    { name: 'name', type: 'string' },
+    { name: 'age', type: 'string' },
+  ],
+});

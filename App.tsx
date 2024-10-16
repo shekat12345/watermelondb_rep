@@ -5,9 +5,9 @@
  * @format
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import type {PropsWithChildren} from 'react';
-import { DatabaseProvider } from '@nozbe/watermelondb/DatabaseProvider';
+import {DatabaseProvider} from '@nozbe/watermelondb/DatabaseProvider';
 import {
   Button,
   SafeAreaView,
@@ -15,6 +15,7 @@ import {
   StatusBar,
   StyleSheet,
   Text,
+  TextInput,
   useColorScheme,
   View,
 } from 'react-native';
@@ -27,14 +28,22 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 // import PostList from './components/PostList';
-import ListCheck from './src/components/listChecker'
-import { database } from './dataBase/database';
+import ListCheck from './src/components/listChecker';
+// import { database } from './dataBase/database';
+
 import AddNEwItem from './src/components/addList';
-import { database12 } from './data2/database';
+import {database13} from './data2/database';
 import test from './rxjs/basic';
-
-
-
+import Pets from './src/components/pets/pets';
+import {
+  addPostWithComments,
+  fetchPostsWithComments,
+  // getComment,
+  // insertAcomment,
+} from './src/services/Postservices';
+import PostsList from './src/posts/components/List';
+import { database } from './src/categories/database';
+import { App123 } from './src/categories';
 
 function App12(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
@@ -77,12 +86,14 @@ function App12(): React.JSX.Element {
   );
 }
 const App = () => {
+  const [value,setValue] = useState('')
   return (
-    <DatabaseProvider database={database12}>
+    <DatabaseProvider database={database}>
       {/* <App11/> */}
       {/* <PostList /> */}
       {/* <AddNEwItem/> */}
-      <ListCheck/>
+      {/* <ListCheck/> */}
+      <></>
       {/* <Button title='press me to test the observable' onPress={()=>{
         // test.subscribe({
         //   next(value) { console.log('Received value:', value); },
@@ -90,6 +101,43 @@ const App = () => {
         // });
         test()
       }}/> */}
+      {/* <Pets/> */}
+      {/* <Button
+        title="Add New post "
+        onPress={() => {
+          const commentsList = [
+            'First comment',
+            'Second comment',
+            'Another interesting comment',
+          ];
+          addPostWithComments('this is new post for testing ', commentsList);
+        }}
+      />
+      <Button
+        title="Get posts"
+        onPress={() => {
+          // fetchPostsWithComments().then(e => {
+          //   e?.map(item => {
+          //     console.log(item.id);
+          //   });
+          // });
+          // getComment('pnYIBl9dLaFXqJbp')
+        }}
+      />
+      <TextInput value={value} onChangeText={setValue}/>
+      <Button
+        title="Add a Comment"
+        onPress={() => {
+          // fetchPostsWithComments().then(e => {
+          //   e?.map(item => {
+          //     console.log(item.id);
+          //   });
+          // });
+          // insertAcomment('pnYIBl9dLaFXqJbp',value)
+        }}
+      />
+      <PostsList value={value}/> */}
+      <App123/>
     </DatabaseProvider>
   );
 };
