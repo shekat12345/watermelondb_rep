@@ -1,4 +1,4 @@
-import { Button } from "react-native"
+import { Button, View } from "react-native"
 import { addChatListWithMessages } from "../services/chats"
 
 export const ChatListTest =()=>{
@@ -17,7 +17,7 @@ export const ChatListTest =()=>{
           
           addChatListWithMessages(chatListData, messagesData)
             .then(() => console.log('ChatList with messages added!'))
-            .catch((error) => console.error('Error adding ChatList with messages:', error));
+            .catch((error) => console.error( error));
           
 
         addChatListWithMessages(chatListData,messagesData).then(()=>{

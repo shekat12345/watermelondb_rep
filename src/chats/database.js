@@ -7,13 +7,7 @@ import Chats from './models/chats';
 import ChatList from './models/chatList';
 
 const adapter = new SQLiteAdapter({
-  dbName: 'YourDBName',
   schema,
-//   migrations,
-  jsi: true /* Platform.OS === 'ios' */,
-  onSetUpError: error => {
-    console.log(error);
-  },
 });
 
 export const database = new Database({

@@ -17,8 +17,7 @@ export default appSchema({
         {name: 'chattid', type: 'string'},
         {name: 'hasMedia', type: 'string', isOptional: true},
         {name: 'sender', type: 'number'},                
-        {name: 'chatID', type: 'string', isIndexed: true},
-        
+        {name: 'chatID', type: 'string', isIndexed: true},        
       ],
     }),
     // and so on

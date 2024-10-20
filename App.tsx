@@ -43,7 +43,9 @@ import {
 } from './src/services/Postservices';
 import PostsList from './src/posts/components/List';
 import { database } from './src/categories/database';
+// import { database } from './src/chats/database';
 import { App123 } from './src/categories';
+import { ChatListTest } from './src/chats/components/chatTest';
 
 function App12(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
@@ -138,6 +140,7 @@ const App = () => {
       />
       <PostsList value={value}/> */}
       <App123/>
+      {/* <ChatListTest/> */}
     </DatabaseProvider>
   );
 };

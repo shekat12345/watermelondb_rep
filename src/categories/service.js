@@ -19,6 +19,7 @@ export async function insertNewProduct({
     await database.write(async () => {
       const productsCollection = database.collections.get('products');
 
+      
       // Create a new product
       await productsCollection.create(product => {
         product.name = name; // Product name

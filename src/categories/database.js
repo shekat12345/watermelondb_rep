@@ -24,3 +24,4 @@ export const database = new Database({
     // and so on
   ],
 });
+
