@@ -49,31 +49,96 @@ export class GenericRepository<T extends Model & {table: string}> {
     console.log(this.dataa);
   }
 
-  async create(table, data: T[], productsData: any[]) {
+  async create(data: T[], productsData: any[]) {
     // alert (JSON.stringify(database))
-    await this.dataa.write(async p => {
-      const collection = await this.dataa.collections.get(`${table}`);
-      const productCollection = await this.dataa.collections.get('products');
+    // await this.dataa.write(async p => {
+    //   const collection = await this.dataa.collections.get(`${table}`);
+    //   const productCollection = await this.dataa.collections.get('products');
 
-      Promise.all(
-        data.map(async (v, i) => {
-          const newData = await collection.create(m => {
-            Object.keys(v).forEach(k => {
-              m[k] = v[k];
-              console.log(
-                k +
-                  'helllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllll',
-              );
-              // product.category.set(category);
+    //   Promise.all(
+    //     data.map(async (v, i) => {
+    //       const newData = await collection.create(m => {
+    //         Object.keys(v).forEach(k => {
+    //           m[k] = v[k];
+    //           console.log(
+    //             k +
+    //               'helllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllll',
+    //           );
+    //           // product.category.set(category);
+    //         });
+    //       });
+    //       console.log(newData);
+    //       return newData;
+    //     }),
+    //   );
+    // });
+
+    try {
+      // Get the collections dynamically
+      const collections = getCollections(['categories', 'products']);
+
+      await database.write(async () => {
+        // Destructure the collections for use
+        const {categories: categoryCollection, products: productCollection} =
+          collections;
+        console.log(Object.keys(Model));
+        await Promise.all(
+          data.map(async categoryData => {
+            // Create the category
+            const newCategory = await collections[
+              categoryData.tableName
+            ].create(category => {
+              Object.keys(categoryData).forEach(k => {
+                category[k] = categoryData[k];
+                // console.log(
+                //   k +
+                //     'helllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllllhelllll',
+                // );
+                product.category.set(category);
+                // alert()
+                if(typeof category[k] === 'object'){
+                  // alert("done")
+                  
+                }
+              });
+              
+              // category.name = categoryData.name;
+              // category.position = categoryData.position;
             });
-          });
-          console.log(newData);
-          return newData;
-        }),
-      );
-    });
+
+            // If the category has products, create those products
+            if (
+              categoryData.innerValue &&
+              categoryData.innerValue.values.length > 0
+            ) {
+              await Promise.all(
+                categoryData.innerValue.values.map(async productData => {
+                  await collections[categoryData?.innerValue?.tableName].create(
+                    product => {
+                      // Dynamically assign product fields
+                      Object.keys(productData).forEach(k => {
+                        product[k] = productData[k]; // Assign each key from productData
+                      });
+
+                      // Link the product to the newly created category
+                      // alert (categoryData?.innerValue?.addTo)
+                      product[categoryData?.innerValue?.addTo].set(newCategory);
+                      // if(productData?.innerValue && productData?.innerValue.values.length > 0){
+                      //   alert ("contains")
+                      // }
+                    },
+                  );
+                }),
+              );
+            }
+          }),
+        );
+      });
+    } catch (error) {
+      console.error('Error creating categories and products:', error);
+    }
   }
-  async Read(table, data: {}) {
+  async Read(table:string, data: {}) {
     try {
       const categoriesCollection = this.dataa.collections.get(`${table}`);
 
@@ -81,24 +146,56 @@ export class GenericRepository<T extends Model & {table: string}> {
       const allCategories = await categoriesCollection.query().fetch();
 
       // For each category, fetch its related products
-      const categoriesWithProducts = await Promise.all(
-        allCategories.map(async category => {
-          const relatedProducts = await category.products.fetch(); // Fetch related products
-          //   console.log('Fetched categories with products:', relatedProducts);
-          return {
-            ...category._raw, // Include category data
-            products: relatedProducts.map(product => product._raw), // Include related products
-          };
-        }),
-      );
+      // const categoriesWithProducts = await Promise.all(
+      //   allCategories.map(async category => {
+      //     const relatedProducts = await category.products.fetch(); // Fetch related products
+      //     //   console.log('Fetched categories with products:', relatedProducts);
+      //     return {
+      //       ...category._raw, // Include category data
+      //       products: relatedProducts.map(product => product._raw), // Include related products
+      //     };
+      //   }),
+      // );
 
-      return categoriesWithProducts;
+      return allCategories;
     } catch (error) {
       alert(error);
     }
   }
-  async Update(data: T[]) {}
+  async Update(tableName,id,data: T[]) {
+
+    try {      
+      await database.write(async () => {
+        const collection = database.collections.get(`${tableName}`);
+  
+        // Find the product by ID
+        const object = await collection.find(id);
+  
+        // Update the product's fields
+        await object.update( () => {
+            // product.name = updatedValues
+            Object.keys(data).forEach((e)=>{
+              object[e] = data[e] || null;
+            })
+          // if (updatedValues.name) product.name = updatedValues.name;
+          // if (updatedValues.code) product.code = updatedValues.code;
+          // if (updatedValues.description) product.description = updatedValues.description || null;
+          // if (updatedValues.price) product.price = updatedValues.price;
+          // if (updatedValues.photo) product.photo = updatedValues.photo || null;
+          // if (updatedValues.unit) product.unit = updatedValues.unit || null;
+        });
+      });
+  
+      console.log('Product successfully updated!');
+    } catch (error) {
+      console.error('Error updating product:', error);
+    }
+
+  }
   async delete(data: any) {}
+  async Replace(data){
+
+  }
 }
 
 const rf = new RepositoryFactory(database);
@@ -210,8 +307,8 @@ export async function createCategoryWithProducts1212(
     position: string;
     tableName: string;
     innerValue?: {
-      tableName:string;
-      addTo:string;
+      tableName: string;
+      addTo: string;
       values: {
         name: string;
         code: string;
@@ -258,16 +355,18 @@ export async function createCategoryWithProducts1212(
           ) {
             await Promise.all(
               categoryData.innerValue.values.map(async productData => {
-                await collections[categoryData?.innerValue?.tableName].create(product => {
-                  // Dynamically assign product fields
-                  Object.keys(productData).forEach(k => {
-                    product[k] = productData[k]; // Assign each key from productData
-                  });
+                await collections[categoryData?.innerValue?.tableName].create(
+                  product => {
+                    // Dynamically assign product fields
+                    Object.keys(productData).forEach(k => {
+                      product[k] = productData[k]; // Assign each key from productData
+                    });
 
-                  // Link the product to the newly created category
-                  // alert (categoryData?.innerValue?.addTo)
-                  product[categoryData?.innerValue?.addTo].set(newCategory);
-                });
+                    // Link the product to the newly created category
+                    // alert (categoryData?.innerValue?.addTo)
+                    product[categoryData?.innerValue?.addTo].set(newCategory);
+                  },
+                );
               }),
             );
           }

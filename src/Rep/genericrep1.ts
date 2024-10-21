@@ -163,3 +163,56 @@ export async function read(table,hasManytomany={has:false,table:""}) {
       console.error('Error fetching categories with products:', error);
     }
   }
+
+  export async function addCategoryWithProductsAndBooks(categoryData:any[], productsData) {
+    try {
+      await database.write(async () => {
+        const categoryCollection = database.collections.get('categories');
+        const productCollection = database.collections.get('products');
+        const bookCollection = database.collections.get('books');
+        categoryData.map((item)=>{
+          const newCategory = await categoryCollection.create((category) => {
+            category.name = categoryData.name;
+            category.position = categoryData.position;
+          });
+          
+
+        })
+        // Step 1: Create the category
+        const newCategory = await categoryCollection.create((category) => {
+          category.name = categoryData.name;
+          category.position = categoryData.position;
+        });
+  
+        // Step 2: Add products and link them to the category
+        await Promise.all(
+          productsData.map(async (productData) => {
+            const newProduct = await productCollection.create((product) => {
+              product.name = productData.name;
+              product.code = productData.code;
+              product.price = productData.price;
+              product.category.set(newCategory); // Link the product to the created category
+            });
+  
+            // Step 3: Add books and link them to the corresponding product
+            if (productData.books && productData.books.length > 0) {
+              await Promise.all(
+                productData.books.map(async (bookData) => {
+                  await bookCollection.create((book) => {
+                    book.title = bookData.title;
+                    book.author = bookData.author;
+                    book.product.set(newProduct); // Link the book to the corresponding product
+                  });
+                })
+              );
+            }
+          })
+        );
+  
+        console.log('Category, products, and books added successfully!');
+      });
+    } catch (error) {
+      console.error('Error adding category, products, and books:', error);
+    }
+  }
+  

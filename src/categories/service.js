@@ -2,7 +2,7 @@
 
 import {Q} from '@nozbe/watermelondb';
 import {database} from './database';
-import { switchMap } from 'rxjs';
+import { combineLatest, map, switchMap } from 'rxjs';
 
 // Function to add a new product
 export async function insertNewProduct({
@@ -182,30 +182,35 @@ export async function getProductsForCategory1212(categoryId) {
       console.error('Error fetching products for category:', error);
     }
   }
-  export function getCategoriesWithProductsObservable() {
+  export  function getCategoriesWithProductsObservable() {
     const categoriesCollection = database.collections.get('categories');
+    const productsCollection = database.collections.get('products');
   
-    // Observe the categories and products together
+    // Observe changes in the categories and products
     return categoriesCollection
-      .query() // Observe all categories
-      .observeWithColumns(['name']) // Observe changes in the 'name' column
+      .query()
+      .observe()
       .pipe(
-        switchMap(async (allCategories) => {
-          // For each category, fetch related products as well
-          const categoriesWithProducts = await Promise.all(
-            allCategories.map(async (category) => {
-              const relatedProducts = await category.products.fetch(); // Fetch related products
-              return {
-                ...category._raw,    // Include category data
-                products: relatedProducts.map(product => product._raw), // Include related products
-              };
-            })
+        switchMap((allCategories) => {
+          // Create an observable that listens to both categories and their related products
+          const categoriesWithProductsObservable = allCategories.map((category) =>
+            combineLatest([
+              category.observe(),  // Observe changes in this category
+              category.products.observe(),  // Observe changes in related products
+            ]).pipe(
+              map(([categoryData, products]) => ({
+                ...categoryData._raw,  // Category data
+                products: products.map((product) => product._raw),  // Products data
+              }))
+            )
           );
-          return categoriesWithProducts;
+  
+          // Combine all category-product observables
+          return combineLatest(categoriesWithProductsObservable);
         })
       );
   }
-  export async function updateProduct(productId, updatedValues) {
+  export async function updateProduct(id, updatedValues) {
     try {
       await database.write(async () => {
         const productsCollection = database.collections.get('products');
@@ -230,4 +235,130 @@ export async function getProductsForCategory1212(categoryId) {
       console.error('Error updating product:', error);
     }
   }
+  export async function UpdateHandler(tableName,productId,updatedValues){
+    
+    try {
+      await database.write(async () => {
+        const productsCollection = database.collections.get(`${tableName}`);
   
+        // Find the product by ID
+        const product = await productsCollection.find(productId);
+  
+        // Update the product's fields
+        await product.update( () => {
+            // product.name = updatedValues
+            Object.keys(updatedValues).forEach((e)=>{
+              product[e] = updatedValues[e] || null;
+            })
+          // if (updatedValues.name) product.name = updatedValues.name;
+          // if (updatedValues.code) product.code = updatedValues.code;
+          // if (updatedValues.description) product.description = updatedValues.description || null;
+          // if (updatedValues.price) product.price = updatedValues.price;
+          // if (updatedValues.photo) product.photo = updatedValues.photo || null;
+          // if (updatedValues.unit) product.unit = updatedValues.unit || null;
+        });
+      });
+  
+      console.log('Product successfully updated!');
+    } catch (error) {
+      console.error('Error updating product:', error);
+    }
+  }
+  export async function ReplaceCategoryProducts(categoryId, newProductsData) {
+    try {
+      await database.write(async () => {
+        const categoryCollection = database.collections.get('categories');
+        const productCollection = database.collections.get('products');
+        
+        // Step 1: Find the category
+        const category = await categoryCollection.find(categoryId);
+  
+        // Step 2: Find and delete all products related to the category
+        const oldProducts = await productCollection.query(Q.where('category_id', categoryId)).fetch();
+        await Promise.all(
+          oldProducts.map(async (product) => {
+            await product.markAsDeleted(); // Mark the old products as deleted
+          })
+        );
+  
+        // Step 3: Insert new products
+        await Promise.all(
+          newProductsData.map(async (productData) => {
+            await productCollection.create((newProduct) => {
+              Object.keys(productData).forEach((key) => {
+                newProduct[key] = productData[key] || null;
+              });
+              newProduct.category.set(category); // Link the new product to the category
+            });
+          })
+        );
+  
+        console.log('Products replaced successfully!');
+      });
+    } catch (error) {
+      console.error('Error replacing products:', error);
+    }
+  }
+  
+  export const debounce = (func, delay) => {
+    let timeout;
+    return (...args) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func(...args), delay);
+    };
+  };
+  export async function addCategoriesWithProductsDynamically(tableName, categoriesData) {
+    try {
+      await database.write(async () => {
+        const collection = database.collections.get(tableName);
+  
+        // Step 1: Iterate over the list of categories
+        await Promise.all(
+          categoriesData.map(async (categoryData) => {
+            // Step 2: Create each category
+            const categoryEntry = await createEntry(collection, categoryData);
+  
+            // Step 3: Handle nested products for each category
+            await handleNestedProducts(categoryEntry, categoryData);
+          })
+        );
+        
+        console.log(`Categories and their related products added successfully!`);
+      });
+    } catch (error) {
+      console.error('Error adding categories and products dynamically:', error);
+    }
+  }
+  
+  // Helper function to create an entry in the table
+  async function createEntry(collection, data) {
+    return await collection.create((entry) => {
+      Object.keys(data).forEach((key) => {
+        if (!Array.isArray(data[key])) { // Only assign non-array values (fields)
+          entry[key] = data[key];
+        }
+      });
+    });
+  }
+  
+  // Helper function to handle the product relationship dynamically
+  async function handleNestedProducts(categoryEntry, data) {
+    if (data.products && Array.isArray(data.products)) {
+      const productCollection = database.collections.get('products');
+  
+      // Loop through each product and add it
+      await Promise.all(
+        data.products.map(async (productData) => {
+          await productCollection.create((product) => {
+            // Set product fields
+            Object.keys(productData).forEach((key) => {
+              product[key] = productData[key];
+            });
+  
+            // Link the product to the category within the create() block
+            product.category.set(categoryEntry);
+          });
+        })
+      );
+    }
+  }

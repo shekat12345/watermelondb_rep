@@ -7,10 +7,14 @@ import Chats from './models/chats';
 import ChatList from './models/chatList';
 
 const adapter = new SQLiteAdapter({
+  dbName: 'ChatDb',
   schema,
+  onSetUpError: error => {
+    console.log(error);
+  },
 });
 
-export const database = new Database({
+export const databaseChat = new Database({
   adapter,
   modelClasses: [
     Chats,

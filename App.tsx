@@ -5,7 +5,7 @@
  * @format
  */
 
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import type {PropsWithChildren} from 'react';
 import {DatabaseProvider} from '@nozbe/watermelondb/DatabaseProvider';
 import {
@@ -42,10 +42,20 @@ import {
   // insertAcomment,
 } from './src/services/Postservices';
 import PostsList from './src/posts/components/List';
-import { database } from './src/categories/database';
+import {database} from './src/categories/database';
 // import { database } from './src/chats/database';
-import { App123 } from './src/categories';
-import { ChatListTest } from './src/chats/components/chatTest';
+import {App123} from './src/categories';
+import {ChatListTest} from './src/chats/components/chatTest';
+import {getCategoriesWithProducts} from './src/categories/service';
+import {
+  categoryData,
+  createCategoriesWithProducts,
+  createCategoriesWithProductsRecursively,
+  getCategoriesWithProductsTest,
+  Read,
+} from './src/Rep/service';
+import {CategoryCollection} from './src/Rep/resp_ali';
+import {databaseChat} from './src/chats/database';
 
 function App12(): React.JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';
@@ -88,7 +98,7 @@ function App12(): React.JSX.Element {
   );
 }
 const App = () => {
-  const [value,setValue] = useState('')
+  const [value, setValue] = useState('');
   return (
     <DatabaseProvider database={database}>
       {/* <App11/> */}
@@ -139,8 +149,34 @@ const App = () => {
         }}
       />
       <PostsList value={value}/> */}
-      <App123/>
+      {/* <App123/> */}
+      {/* <ChatListTest /> */}
       {/* <ChatListTest/> */}
+      <Button
+        title="hello press for teswwwt "
+        onPress={async () => {
+          // createCategoriesWithProducts(categoryData)
+          // let erff =await Read()
+          // console.log(erff)
+          const categoryData = [
+            {
+              name: 'Electronics',
+              position: '1',
+              products: [
+                {name: 'Smartphone', code: 'P001', price: 500},
+                {name: 'Laptop', code: 'P002', price: 1200},
+              ],
+            },
+            {
+              name: 'Mathematics',
+              position: '3',
+              products: [{name: 'Calculator', code: 'P004', price: 50}],
+            },
+          ];
+          // createCategoriesWithProductsRecursively(categoryData);
+          CategoryCollection.create(categoryData);
+        }}
+      />
     </DatabaseProvider>
   );
 };

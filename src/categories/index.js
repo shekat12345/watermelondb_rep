@@ -1,5 +1,7 @@
 import {Button, FlatList, Text, TextInput, View} from 'react-native';
 import {
+  ReplaceCategoryProducts,
+  UpdateHandler,
   getCategories,
   getCategoriesWithPagination,
   getCategoriesWithProducts,
@@ -25,6 +27,7 @@ import {
   testOfCollections,
 } from '../Rep/GenericRep';
 import Product from './product';
+import { CategoryCollection } from '../Rep/newRepo';
 
 export const App1231 = () => {
   const [data, setData] = useState([]);
@@ -73,7 +76,7 @@ export const App1231 = () => {
           });
           //   insertNewCategory();
         }}>
-        Hello hello hello{' '}
+        Hello hello hesssllo{' '}
       </Text>
       <Button
         onPress={async () => {
@@ -148,6 +151,7 @@ export const App123 = () => {
   const subscribeToData = () => {
     const subscription = getCategoriesWithProductsObservable().subscribe(
       categoriesWithProducts => {
+        
         setData(categoriesWithProducts); // Update the data state
       },
     );
@@ -159,10 +163,11 @@ export const App123 = () => {
     const subscription = subscribeToData(); // Start the subscription
 
     // Handle manual data updates (e.g., after adding/updating a product)
-    eventEmitter.on(emmitersList.updateDataBase, () => {
-      subscription.unsubscribe(); // Clean up the old subscription
-      subscribeToData(); // Re-subscribe to get the latest data
-    });
+    // eventEmitter.on(emmitersList.updateDataBase, () => {
+    //   alert ("heheh")
+    //   subscription.unsubscribe(); // Clean up the old subscription
+    //   subscribeToData(); // Re-subscribe to get the latest data
+    // });
 
     // Cleanup the subscription when the component unmounts
     return () => {
@@ -174,17 +179,20 @@ export const App123 = () => {
     <View>
       <Button
         title="Hello world "
-        onPress={()=>{
+        onPress={() => {
           // testOfCollections(['categories','products'])
-          createCategoryWithProducts1212([
+          const erf = new GenericRepository(database);
+          const rf = new RepositoryFactory(database);
+          rf.GetGeneric(Product).create([
             {
-              name: 'hello',tableName:"categories", 
+              name: 'hello',
+              tableName: 'categories',
               position: '120',
-              
+
               innerValue: {
-                tableName:"products",
-                addTo:"category",
-                values:[
+                tableName: 'products',
+                addTo: 'category',
+                values: [
                   {
                     name: 'Product Name 1',
                     code: 'PROD123',
@@ -192,7 +200,10 @@ export const App123 = () => {
                     price: 100,
                     photo: 'http://example.com/photo.jpg',
                     unit: 'kg',
-                    categoryId: 'G5dBsz4jbcrcWZOP' // Replace with actual category ID
+                    categoryId: 'G5dBsz4jbcrcWZOP', // Replace with actual category ID
+                    innerValue: {
+                      values: [1, 2, 3, 4],
+                    },
                   },
                   {
                     name: 'Product Name 2',
@@ -201,17 +212,16 @@ export const App123 = () => {
                     price: 150,
                     photo: 'http://example.com/photo2.jpg',
                     unit: 'kg',
-                    categoryId: 'G5dBsz4jbcrcWZOP' // Replace with actual category ID
-                  }
-                ]
-              }
+                    categoryId: 'G5dBsz4jbcrcWZOP', // Replace with actual category ID
+                  },
+                ],
+              },
             },
-            { name: 'hello1',tableName:"categories", position: '120' }, // No products for this category
-            { name: 'hello2',tableName:"categories", position: '120' }, // No products for this category
-            { name: 'hello3',tableName:"categories", position: '120' }, // No products for this category
-            { name: 'hello4',tableName:"categories", position: '120' }  // No products for this category
-          ])
-          alert ("hello")
+            {name: 'hello1', tableName: 'categories', position: '120'}, // No products for this category
+            {name: 'hello2', tableName: 'categories', position: '120'}, // No products for this category
+            {name: 'hello3', tableName: 'categories', position: '120'}, // No products for this category
+            {name: 'hello4', tableName: 'categories', position: '120'}, // No products for this category
+          ]);
         }}
         // onPress={async() => {
         //   // alert ("gello ")
@@ -250,7 +260,7 @@ export const App123 = () => {
         //   // }]);
         //   // await createCategoryWithProducts([
         //   //   {
-        //   //     name: 'hello', 
+        //   //     name: 'hello',
         //   //     position: '120',
         //   //     products: [
         //   //       {
@@ -279,7 +289,6 @@ export const App123 = () => {
         //   //   { name: 'hello4', position: '120' }  // No products for this category
         //   // ])
         // }}
-        
       />
       <Button
         title="Test for get method  "
@@ -288,8 +297,16 @@ export const App123 = () => {
           const rf = new RepositoryFactory(database);
           let erff = await rf
             .GetGeneric(Product)
-            .Read('categories', {name: ''})
-          console.log(erff.map((item)=>item.products))
+            .Read('categories', {name: ''});
+          const categoriesWithProducts = await Promise.all(
+            erff.map(async item => {
+              let relatedProducts = await item.products.fetch(); // Fetch related products
+              relatedProducts = relatedProducts.map(product => product._raw);
+
+              return {...item._raw, products: relatedProducts};
+            }),
+          );
+          console.log(categoriesWithProducts);
         }}
       />
       <Button
@@ -300,17 +317,14 @@ export const App123 = () => {
       />
       <Text
         onPress={() => {
-          insertNewProduct({
-            name: 'Product Name',
-            code: 'PROD123',
-            description: 'This is a sample product.',
-            price: 100,
-            photo: 'http://example.com/photo.jpg',
-            unit: 'kg',
-            categoryId: 'G5dBsz4jbcrcWZOP', // Replace with actual category ID
-          });
+          CategoryCollection.create([
+            {name: 'hello1', tableName: 'categories', position: '120'},
+            {name: 'hello2', tableName: 'categories', position: '120'},
+            {name: 'hello3', tableName: 'categories', position: '120'},
+            {name: 'hello4', tableName: 'categories', position: '120'},
+          ]);
         }}>
-        Hello hello hello{' '}
+        Hello hello hewdwdllo111{' '}
       </Text>
       <Button
         onPress={async () => {
@@ -321,14 +335,46 @@ export const App123 = () => {
       <TextInput value={value} onChangeText={setValue} />
       {open && (
         <FlatList
-          data={data.slice(0, 5)}
+          data={data}
           renderItem={({item}) => (
             <>
               <Text
-                onPress={() => {
+                onPress={async () => {
+                  const rf = new RepositoryFactory(database);
+                  let erff = await rf.GetGeneric(Product);
+                  erff.Update('categories',item.id,{name:"jejejejejej"})
                   // console.log(item.products[0].id)
-                  updateProduct(item.products[0].id, value);
-                  eventEmitter.emit(emmitersList.updateDataBase);
+                  // UpdateHandler(item.products[0].id, {name:value});
+                  // UpdateHandler('categories',item?.id,{name:value});
+                  // ReplaceCategoryProducts(item?.id,[
+                  //   {
+                  //     name: 'Product Name 1',
+                  //     code: 'PROD123',
+                  //     description: 'This is a sample product.',
+                  //     price: 100,
+                  //     photo: 'http://example.com/photo.jpg',
+                  //     unit: 'kg',
+                  //     categoryId: 'G5dBsz4jbcrcWZOP', // Replace with actual category ID
+                  //     innerValue: {
+                  //       values: [1, 2, 3, 4],
+                  //     },
+                  //   },
+                  //   {
+                  //     name: 'Product Name 2',
+                  //     code: 'PROD124',
+                  //     description: 'This is another sample product.',
+                  //     price: 150,
+                  //     photo: 'http://example.com/photo2.jpg',
+                  //     unit: 'kg',
+                  //     categoryId: 'G5dBsz4jbcrcWZOP', // Replace with actual category ID
+                  //   },
+                  // ]).then(()=>{
+                  //   eventEmitter.emit(emmitersList.updateDataBase);
+                  // });
+                  // alert (item?.id)
+
+                  // eventEmitter.emit(emmitersList.updateDataBase);
+                  // const debouncedUpdateHandler = debounce(UpdateHandler, 300);
                 }}>
                 {item.name}{' '}
                 {JSON.stringify(item.products.map(item1 => item1.name))}

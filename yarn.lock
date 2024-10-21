@@ -2003,6 +2003,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@noble/hashes@npm:1.4.0":
+  version: 1.4.0
+  resolution: "@noble/hashes@npm:1.4.0"
+  checksum: 8ba816ae26c90764b8c42493eea383716396096c5f7ba6bea559993194f49d80a73c081f315f4c367e51bd2d5891700bcdfa816b421d24ab45b41cb03e4f3342
+  languageName: node
+  linkType: hard
+
+"@noble/post-quantum@npm:^0.2.0":
+  version: 0.2.0
+  resolution: "@noble/post-quantum@npm:0.2.0"
+  dependencies:
+    "@noble/hashes": 1.4.0
+  checksum: d3ba53e0c8e2e5b33329f216bb977a8297baaa27c4b7312f7efec2b7d536f0f8009044c54c14afc5f41be234fdfb3467745732b5def81963a793f39412584b33
+  languageName: node
+  linkType: hard
+
 "@nodelib/fs.scandir@npm:2.1.5":
   version: 2.1.5
   resolution: "@nodelib/fs.scandir@npm:2.1.5"
@@ -7185,6 +7201,7 @@ __metadata:
     "@babel/plugin-transform-runtime": ^7.25.7
     "@babel/preset-env": ^7.20.0
     "@babel/runtime": ^7.20.0
+    "@noble/post-quantum": ^0.2.0
     "@nozbe/watermelondb": ^0.27.1
     "@nozbe/with-observables": ^1.6.0
     "@react-native/babel-preset": 0.75.4
