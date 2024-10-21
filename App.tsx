@@ -31,152 +31,43 @@ import {
 import ListCheck from './src/components/listChecker';
 // import { database } from './dataBase/database';
 
-import AddNEwItem from './src/components/addList';
-import {database13} from './data2/database';
-import test from './rxjs/basic';
-import Pets from './src/components/pets/pets';
-import {
-  addPostWithComments,
-  fetchPostsWithComments,
-  // getComment,
-  // insertAcomment,
-} from './src/services/Postservices';
-import PostsList from './src/posts/components/List';
+
+
+
 import {database} from './src/categories/database';
-// import { database } from './src/chats/database';
-import {App123} from './src/categories';
-import {ChatListTest} from './src/chats/components/chatTest';
-import {getCategoriesWithProducts} from './src/categories/service';
-import {
-  categoryData,
-  createCategoriesWithProducts,
-  createCategoriesWithProductsRecursively,
-  getCategoriesWithProductsTest,
-  Read,
-} from './src/Rep/service';
+
+
 import {CategoryCollection} from './src/Rep/resp_ali';
-import {databaseChat} from './src/chats/database';
 
-function App12(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
+import ProductCategory from './src/categories/categories';
 
-  return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
-}
 const App = () => {
   const [value, setValue] = useState('');
+  const Action = () => {
+    async () => {      
+      const categoryData = [
+        {
+          name: 'Electronics',
+          position: '1',
+          products: [
+            {name: 'Smartphone', code: 'P001', price: 500},
+            {name: 'Laptop', code: 'P002', price: 1200},
+          ],
+        },
+        {
+          name: 'Mathematics',
+          position: '3',
+          products: [{name: 'Calculator', code: 'P004', price: 50}],
+        },
+      ];
+      // createCategoriesWithProductsRecursively(categoryData);
+      CategoryCollection.create(categoryData);
+    };
+  };
   return (
     <DatabaseProvider database={database}>
-      {/* <App11/> */}
-      {/* <PostList /> */}
-      {/* <AddNEwItem/> */}
-      {/* <ListCheck/> */}
-      <></>
-      {/* <Button title='press me to test the observable' onPress={()=>{
-        // test.subscribe({
-        //   next(value) { console.log('Received value:', value); },
-        //   complete() { console.log('Stream complete'); }
-        // });
-        test()
-      }}/> */}
-      {/* <Pets/> */}
-      {/* <Button
-        title="Add New post "
-        onPress={() => {
-          const commentsList = [
-            'First comment',
-            'Second comment',
-            'Another interesting comment',
-          ];
-          addPostWithComments('this is new post for testing ', commentsList);
-        }}
-      />
-      <Button
-        title="Get posts"
-        onPress={() => {
-          // fetchPostsWithComments().then(e => {
-          //   e?.map(item => {
-          //     console.log(item.id);
-          //   });
-          // });
-          // getComment('pnYIBl9dLaFXqJbp')
-        }}
-      />
-      <TextInput value={value} onChangeText={setValue}/>
-      <Button
-        title="Add a Comment"
-        onPress={() => {
-          // fetchPostsWithComments().then(e => {
-          //   e?.map(item => {
-          //     console.log(item.id);
-          //   });
-          // });
-          // insertAcomment('pnYIBl9dLaFXqJbp',value)
-        }}
-      />
-      <PostsList value={value}/> */}
-      {/* <App123/> */}
-      {/* <ChatListTest /> */}
-      {/* <ChatListTest/> */}
-      <Button
-        title="hello press for teswwwt "
-        onPress={async () => {
-          // createCategoriesWithProducts(categoryData)
-          // let erff =await Read()
-          // console.log(erff)
-          const categoryData = [
-            {
-              name: 'Electronics',
-              position: '1',
-              products: [
-                {name: 'Smartphone', code: 'P001', price: 500},
-                {name: 'Laptop', code: 'P002', price: 1200},
-              ],
-            },
-            {
-              name: 'Mathematics',
-              position: '3',
-              products: [{name: 'Calculator', code: 'P004', price: 50}],
-            },
-          ];
-          // createCategoriesWithProductsRecursively(categoryData);
-          CategoryCollection.create(categoryData);
-        }}
-      />
+      <Button title="hello press for teswwwt " onPress={Action} />
     </DatabaseProvider>
   );
 };
